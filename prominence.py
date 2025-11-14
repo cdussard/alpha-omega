@@ -90,7 +90,6 @@ fmin, fmax = 2, 80  # Example values (update as needed)
 # Loop over patients and sides
 results = []
 fs = 1375  # Sampling frequency
-
 for patient_ind in range(5):  # Patients 0 to 4
     for side in ["right", "left"]:
         # Define patient name and side
@@ -130,6 +129,24 @@ for patient_ind in range(5):  # Patients 0 to 4
             electrode = desc[0]
             depth = desc[1]
 
+            # Determine if the electrode is a target or control
+            if any(elec == electrode and depth in depths for elec, depths in targets):
+                elec_type = "target"
+            elif any(elec == electrode and depth in depths for elec, depths in controls):
+                elec_type = "control"
+            else:
+                elec_type = "unknown"  # In case it's neither target nor control
+
+            # Determine the region based on type and depth
+            if elec_type == "target":
+                region = "STN"
+            elif elec_type == "control" and depth > 0:
+                region = "above"
+            elif elec_type == "control" and depth < 0:
+                region = "SNR"
+            else:
+                region = "unknown"
+
             # Compute the power spectrum
             freq_med, psd_med = compute_spectrum(sig, fs, method='welch', avg_type='median', nperseg=fs * 2, f_range=[fmin, fmax])
 
@@ -154,6 +171,8 @@ for patient_ind in range(5):  # Patients 0 to 4
                     "width_heights": width_heights[i],
                     "electrode": electrode,
                     "depth": depth,
+                    "type": elec_type,  # Add the type (target or control)
+                    "region": region,  # Add the region (STN, above, SNR)
                 })
 
 # Convert results to a DataFrame

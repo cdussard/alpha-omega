@@ -7,12 +7,10 @@ Created on Thu Dec 26 15:33:25 2024
 import os
 import pathlib
 from neo.io import AlphaOmegaIO
-from neo.core import Block, Segment, Group, AnalogSignal
 import matplotlib.pyplot as plt
-import numpy as np
-from functions import *
+from functions import desired_files,get_plot
 
-os.chdir("./")
+os.chdir("../../")
 lustre_data_dir = "DATA/"
 lustre_path = pathlib.Path(lustre_data_dir)
 os.chdir(lustre_path)
@@ -85,7 +83,7 @@ ind_type = types_data.index(type_a_afficher)
 fmin = 4
 fmax = 40
 fmin_disp = 6
-fmax_disp = 45
+fmax_disp = 50
 
 # Loop sur les patients et les côtés
 for patient_ind in range(5):  # 0 à 4 inclus
@@ -107,11 +105,11 @@ for patient_ind in range(5):  # 0 à 4 inclus
         files_target, desc_target, files_target_filtered = desired_files(
             fichiers_patient_target,
             [targets[patient_ind]] + [controls[patient_ind]],
-            False,
             patient_name,
             cote,
             fmin,
             fmax,
+            ind_type
         )
 
         # Choisir les fichiers filtrés ou non
@@ -127,12 +125,12 @@ for patient_ind in range(5):  # 0 à 4 inclus
         files_sorted = [files[i] for i in sorted_indices]
 
         # Générer et sauvegarder le plot
-        filename = f"{patient_name}_{side}.png"
+        filename = f"{patient_name}_{side}_hfo.png"
         get_plot(fmin_disp, fmax_disp, files_sorted, desc_sorted, True)
         plt.savefig(filename)
         plt.close()  # Fermer la figure pour libérer la mémoire
         
-        filename = f"{patient_name}_{side}_unscaled.png"
+        filename = f"{patient_name}_{side}_unscaled_hfo.png"
         get_plot(fmin_disp, fmax_disp, files_sorted, desc_sorted, False)
         plt.savefig(filename)
         plt.close()  # Fermer la figure pour libérer la mémoire
